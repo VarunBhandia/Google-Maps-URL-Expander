@@ -18,39 +18,42 @@ def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, 
     percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
     filledLength = int(length * iteration // total)
     bar = fill * filledLength + '-' * (length - filledLength)
-    print('\r%s |%s| %s%% %s' % (prefix, bar, percent, suffix), end = '\r')
+    print('[#] %s |%s| %s%% %s' % (prefix, bar, percent, suffix), end = '\r')
     # Print New Line on Complete
     if iteration == total: 
         print()
 
 def expand_url(urls):
     expanded_url_list = []
-    print("Reading the File")
+    count =0 
+
     dfe = pd.read_csv(file_name)
     urls = list(dfe['Location'])
-    print("Expanding the URLs")
-    f = open("nihit_ki_bandi.txt", "w")
-    count =0 
     length = len(urls)
+    
+    print("[#] Expanding the URLs")
     printProgressBar(0, length, prefix = 'Progress:', suffix = 'Complete', length = 50)
 
+    # Traversing through each URL
     for url in urls:
         count =count +1
         printProgressBar(count, length, prefix = 'Progress:', suffix = 'Complete', length = 50)
+
         if(len(url) <= 38 and url[0:5] == "https"):
             r = requests.get(url)
             expanded_url_list.append(r.url)
         else:
             expanded_url_list.append(url)
-
+    
+    # Writing in a file
+    f = open("updated_url.txt", "w")
     for expanded_url in expanded_url_list:
         f.write(expanded_url)
         f.write("\n")
-    print("You can now fuck Nihit ki bandi.")
-    
     f.close()
-
+    
+    print("[#] Check the file with name updated_url.txt.")
     return expanded_url_list
 
-file_name = 'sexy.csv'
+file_name = 'data.csv'
 expand_url(file_name)
