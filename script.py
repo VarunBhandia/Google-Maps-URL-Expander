@@ -15,7 +15,7 @@ def expand_url(urls):
         count =count +1
         percentage_completed = (count * 100)/length 
         print(round(percentage_completed), '% completed')
-        if(len(url) == 37):
+        if(len(url) <= 38 and url[0:5] == "https"):
             r = requests.get(url)
             expanded_url_list.append(r.url)
         else:
