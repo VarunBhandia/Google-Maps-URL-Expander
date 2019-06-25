@@ -1,9 +1,12 @@
 import requests
 import pandas as pd
 import pprint
+import csv
 
 # Print iterations progress
-def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█'):
+
+
+def printProgressBar(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█'):
     """
     Call in a loop to create terminal progress bar
     @params:
@@ -15,45 +18,48 @@ def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, 
         length      - Optional  : character length of bar (Int)
         fill        - Optional  : bar fill character (Str)
     """
-    percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
+    percent = ("{0:." + str(decimals) + "f}").format(100 *
+                                                     (iteration / float(total)))
     filledLength = int(length * iteration // total)
     bar = fill * filledLength + '-' * (length - filledLength)
-    print('[#] %s |%s| %s%% %s' % (prefix, bar, percent, suffix), end = '\r')
+    print('[#] %s |%s| %s%% %s' % (prefix, bar, percent, suffix), end='\r')
     # Print New Line on Complete
-    if iteration == total: 
+    if iteration == total:
         print()
 
-def expand_url(urls):
-    expanded_url_list = []
-    count =0 
 
-    dfe = pd.read_csv(file_name)
-    urls = list(dfe['Location'])
-    length = len(urls)
-    
-    print("[#] Expanding the URLs")
-    printProgressBar(0, length, prefix = 'Progress:', suffix = 'Complete', length = 50)
+def expand_url(file_name):
 
-    # Traversing through each URL
-    for url in urls:
-        count =count +1
-        printProgressBar(count, length, prefix = 'Progress:', suffix = 'Complete', length = 50)
+    with open('data.csv','r') as csvinput:
+        with open('output.csv', 'w') as csvoutput:
 
-        if(len(url) <= 38 and url[0:5] == "https"):
-            r = requests.get(url)
-            expanded_url_list.append(r.url)
-        else:
-            expanded_url_list.append(url)
-    
-    # Writing in a file
-    f = open("updated_url.txt", "w")
-    for expanded_url in expanded_url_list:
-        f.write(expanded_url)
-        f.write("\n")
-    f.close()
-    
-    print("[#] Check the file with name updated_url.txt.")
-    return expanded_url_list
+            writer = csv.writer(csvoutput, lineterminator='\n')
+            reader = csv.reader(csvinput)
+            all = []
+            row_header = next(reader)
+            print(row_header)
+            row_header.append('Updated Location')
+            all.append(row_header)
+
+            # printProgressBar(0, l, prefix = 'Progress:', suffix = 'Complete', length = 50)
+            for row in reader:
+
+                # printProgressBar(i + 1, l, prefix = 'Progress:', suffix = 'Complete', length = 50)
+
+                if(len(row[0]) <= 38 and row[0][0:5] == "https"):
+                    r = requests.get(row[0])
+                    updated_url = r.url
+                    row.append(updated_url)
+                else:
+                    updated_url = row[0]
+                    row.append(updated_url)
+                all.append(row)
+
+            writer.writerows(all)
+
+    print("[#] Check the file with name Output.csv")
+    return all
 
 file_name = 'data.csv'
+
 expand_url(file_name)
